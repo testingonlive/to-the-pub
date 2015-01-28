@@ -1,3 +1,4 @@
+// export promise module 
 module.export = {
     
     promiseScript: function( url ) {
