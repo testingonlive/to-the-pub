@@ -4,44 +4,14 @@
     <title></title>
 	
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script async src="//maps.googleapis.com/maps/api/js?key=AIzaSyCJkBA7uyrjebddFkvjk2dEiWPzNXqaIGw&callback=mapsInit"></script>
+	<script async src="//maps.googleapis.com/maps/api/js?key=AIzaSyCJkBA7uyrjebddFkvjk2dEiWPzNXqaIGw&libraries=places&callback=mapsInit"></script>
 	
 	<style>
 		html, body {
 			height: 100%;
 			margin: 0;
 			overflow: hidden;
-		}
-
-		.top, .bottom {
-			height: 50%;
-			width: 100%;
-			transition: height 2s;
-			z-index: 1;
-			position: absolute;
-		}	
-		.top {
-			background: blue;
-		}	
-
-		.bottom {
-			background: darkblue;			
-			bottom: 0;
-		}
-
-		.circle {
-			border-radius: 50%;
-		}
-		
-		.go {
-			width: 200px;
-			height: 200px;
-			left: 50%;
-			top: -100px;
-			background: #000;
-			position: relative;
-			margin-left: -100px;
-		}
+		}		
 		
 		.mapCanvas {
 			position: absolute;
@@ -55,16 +25,8 @@
 	</style>
 </head>
 <body>
-	<div class="mapCanvas"></div>
-
-	<!--	
-
-	<div class="top"></div>
-	<div class="bottom">
-		<div class="circle go"></div>
-	</div>
-
-	-->
+    <div class="mapCanvas"></div>
+	
 
 	<script>
 		function mapsInit(){
@@ -72,41 +34,57 @@
 		}
 		
 		;!function( $, window, undefined ){
-			var downed = false,
-				doing = false,
-				$bottomTop = $( '.bottom, .top' );
 			
-			$( '.go' ).click( function( evt ){
-				if ( !doing && !downed ){
-					doing = true;
-					downed = true;
-					$bottomTop.css( 'height', '0px' );
-				} else if ( !doing && downed ){
-					doing = true;
-					downed = false;
-					$bottomTop.css( 'height', '50%' );
-				};					
-			});
-			
-			$bottomTop.on( 'transitionend webkitTransitionEnd', function( evt ){
-				doing = false;
-			});
 			
 			$( document ).on( 'mapsReady', function(){
 				navigator.geolocation.getCurrentPosition( function( pos ){
 					var mapOptions = {
-					center: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-					zoom: 12
-				};
+					    center: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+					    zoom: 17
+				    };
+                    
+                    var request = {
+                        location: new google.maps.LatLng( pos.coords.latitude, pos.coords.longitude ),
+                        radius: 100,
+                        types: [ 'bar' ],
+                        keyword: 'bar'
+                    };
 				
-				var map = new google.maps.Map( $( '.mapCanvas' )[ 0 ], mapOptions );
-				var marker = new google.maps.Marker( { position: mapOptions.center, map: map });
-				}, function( error ){
+				    var map = new google.maps.Map( $( '.mapCanvas' )[ 0 ], mapOptions );
+                    
+                    var info = new google.maps.InfoWindow();
+                    
+                    var service = new google.maps.places.PlacesService( map ).nearbySearch( request, function( res, status ){
+                        if ( status === google.maps.places.PlacesServiceStatus.OK ){
+                            
+                            res.forEach( function( elm ){
+                                var placeLoc = elm.geometry.location;
+                                var marker = new google.maps.Marker({
+                                    map: map,
+                                    position: elm.geometry.location
+                                });
+                                
+                                google.maps.event.addListener( marker, 'click', function(){
+                                    console.log( elm.name );
+                                    info.setContent( elm.name );
+                                    info.open( map, this );
+                                })
+                            })
+                            
+                        }
+                        
+                        
+                    })
+                   
+				   
+                
+                
+                }, function( error ){
 					console.log( error );
 				});
 				
-			});
-			
+		
+            });
 			
 			
 		}( jQuery, window );
