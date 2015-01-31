@@ -45,9 +45,11 @@
                     
                     var request = {
                         location: new google.maps.LatLng( pos.coords.latitude, pos.coords.longitude ),
-                        radius: 100,
-                        types: [ 'bar' ],
-                        keyword: 'bar'
+                        //radius: 1000,
+                       // types: [ 'bar' ],
+                        keyword: 'pub',
+                                        rankBy: google.maps.places.RankBy.DISTANCE
+
                     };
 				
 				    var map = new google.maps.Map( $( '.mapCanvas' )[ 0 ], mapOptions );
