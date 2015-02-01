@@ -15,13 +15,28 @@
 			overflow: hidden;
 		}		
 		
-		.mapCanvas {
+		.mapCanvas, .pubinfo {
 			position: absolute;
 			top: 0;
 			left 0;
 			width: 100%;
 			height: 100%;
 		}
+        
+        .pubinfo {
+           
+            background: #fff;
+            -webkit-clip-path: circle( 0% at center );
+            clip-path: circle( 0% at center ); 
+            transition: all 5s;
+            z-index: -1;
+        }
+        
+        .pubinfo.clicked {
+           z-index: 1;
+            -webkit-clip-path: circle( 100% at center );
+            clip-path: circle( 100% at center );             
+        }
 		
 		
 	</style>
@@ -29,6 +44,7 @@
 <body>
     <div class="mapCanvas"></div>
 	
+    <div class="pubinfo"></div>
 
 	
 </body>

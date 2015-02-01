@@ -61,6 +61,13 @@ function promisePubDetails( id, map ) {
 }
 
 
+function pubTemplate( obj ) {
+    
+    return '<img src="' + obj.img + '" alt="pub photo" />' + 
+           '<span class="name">' + obj.name + '</span>';      
+}
+
+
 /*
  * 
  * get things going
@@ -71,7 +78,8 @@ function promisePubDetails( id, map ) {
 function mapsInit(){
 
     // set map in function scope.
-    var map;
+    var map,
+        info = document.querySelector( '.pubinfo' );
     
     
     promiseGeoLocn()
@@ -91,24 +99,40 @@ function mapsInit(){
         })
 
         .then( function( pubs ){
-            var info = new google.maps.InfoWindow();
-            // loop through the pubs array
-            // just replicating old behaviour for now
-            pubs.forEach( function( pub ){
-                var placeLoc = pub.geometry.location;
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: pub.geometry.location
-                });
 
-                google.maps.event.addListener( marker, 'click', function(){
-                    promisePubDetails( pub.place_id, map ).then(function( data ){
-                        console.log( data );
-                        window.test = data;
-                    })
-                })
-            })
+            // for now just interested in the nearest pub
+            // @TODO next / prev button
+            var pub = pubs[ 0 ];
 
+            return promisePubDetails( pub.place_id, map );            
+        })
+    
+        .then( function( details ){
+            
+            var _pubObj = {
+                img: details.photos[ 0 ].getUrl( { maxHeight: window.innerHeight, maxWidth: window.innerWidth } ),
+                name: details.name
+            }
+            
+            // set the info window conent
+            info.innerHTML = pubTemplate( _pubObj );
+        
+        
+            // give the pub a marker
+            var pubMarker = new google.maps.Marker({
+                map: map,
+                position: details.geometry.location
+            });
+        
+            // when its clicked we'll log some details
+            google.maps.event.addListener( pubMarker, 'click', function(e){
+                console.log( e );
+                
+                info.classList.add( 'clicked' );
+                
+            });
+        
+        
         })
 
 
